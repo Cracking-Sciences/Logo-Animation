@@ -100,9 +100,9 @@ class Opening(Scene):
     def __init__(self):
         super().__init__()
         self.original_slope = PI * 0.35
-        self.tilt = PI * 0.05
+        self.tilt = PI * 0.04
         self.left_suppress_height = 6
-        self.left_suppress_thickness = 1.25
+        self.left_suppress_thickness = 1.20
         self.bar_height = 2.1
         self.bar_thickness = 0.9
         self.main_color = ManimColor("#AA0000")
@@ -123,10 +123,14 @@ class Opening(Scene):
         )
 
         bar_final_offset_length = -0.77
-        bar_1_initial_move_length = -0.56 # along x axis
-        bar_2_initial_move_length = 0 # 0.5 # along x axis
-        bar_1_then_move_length = bar_final_offset_length - bar_1_initial_move_length
-        bar_2_then_move_length = bar_final_offset_length - bar_2_initial_move_length
+        bar_1_initial_move_length = -0.37 # along x axis
+        bar_2_initial_move_length = 0.02 # 0.5 # along x axis
+        # a little before fully aligning is beautiful...
+        bar_1_leave = - 0.1
+        bar_2_leave = - 0.2
+        
+        bar_1_then_move_length = bar_final_offset_length - bar_1_initial_move_length - bar_1_leave
+        bar_2_then_move_length = bar_final_offset_length - bar_2_initial_move_length - bar_2_leave
         
         bar_1_hold = [0,0,0]
         bar_1_initial_offset = [0,0,0]
@@ -207,12 +211,16 @@ class Opening(Scene):
         # fade out
         self.play(AnimationGroup(
                 left_suppress.uncreate_animation(),
-                bar_1.uncreate_animation(),
-                bar_2.uncreate_animation(),
-                lag_ratio=0.05
+                AnimationGroup(
+                    bar_1.uncreate_animation(),
+                    bar_2.uncreate_animation(),
+                    lag_ratio=0.2
+                ),
+                lag_ratio=0
             ),
+                  run_time=0.8
         )
-        self.wait()
+        self.wait(0.1)
         
 
-# manim -pql logo.py Opening
+# manim -pqh logo.py Opening
