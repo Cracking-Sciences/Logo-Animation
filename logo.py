@@ -43,7 +43,12 @@ class LeftSuppress(VMobject):
                 FadeIn(self.left_suppress_fill),
                 lag_ratio=0.25
             )
-
+    
+    def uncreate_animation(self):
+        return AnimationGroup(
+            FadeOut(self.group, shift = RIGHT*3),
+            Uncreate(self.left_suppress_shape)
+        )
 class Bar(VMobject):
     def __init__(self, sub_color, sub_opacity, original_slope, bar_height, bar_thickness, 
                  initial_offsets = [0,0,0],
@@ -80,32 +85,35 @@ class Bar(VMobject):
         fill = self.shape.copy()
         fill.set_fill(self.sub_color, opacity=self.sub_opacity)
         return AnimationGroup(
-                Create(self.bar_shape),
-                FadeIn(self.bar_fill),
-                lag_ratio=0.25
-            )
-
+            Create(self.bar_shape),
+            FadeIn(self.bar_fill),
+            lag_ratio=0.25
+        )
+    def uncreate_animation(self):
+        return AnimationGroup(
+            FadeOut(self.bar_fill),
+            Uncreate(self.bar_shape),
+            lag_ratio=0.05
+        )
 
 class Opening(Scene):
     def __init__(self):
         super().__init__()
         self.original_slope = PI * 0.35
+        self.tilt = PI * 0.05
         self.left_suppress_height = 6
         self.left_suppress_thickness = 1.25
-        self.bar_height = 2.5
-        self.bar_thickness = 1
-        self.main_color = PURE_RED
+        self.bar_height = 2.1
+        self.bar_thickness = 0.9
+        self.main_color = ManimColor("#AA0000")
         self.main_opacity = 0.8
-        self.sub_color = WHITE
+        self.sub_color = ManimColor("#BBBBBB")
         self.sub_opacity = 0.8
-        
+
     def construct(self):
         plane = NumberPlane()
         # self.add(plane)
-        
-        
-        bar_1_final_place = [0,0,0]
-        
+
         left_suppress = LeftSuppress(
             self.main_color,
             self.main_opacity,
@@ -113,9 +121,10 @@ class Opening(Scene):
             self.left_suppress_height,
             self.left_suppress_thickness,
         )
+
         bar_final_offset_length = -0.77
-        bar_1_initial_move_length = -0.2 # along x axis
-        bar_2_initial_move_length = 0.5 # along x axis
+        bar_1_initial_move_length = -0.56 # along x axis
+        bar_2_initial_move_length = 0 # 0.5 # along x axis
         bar_1_then_move_length = bar_final_offset_length - bar_1_initial_move_length
         bar_2_then_move_length = bar_final_offset_length - bar_2_initial_move_length
         
@@ -165,9 +174,10 @@ class Opening(Scene):
             run_time=1
         )
         
+        # move to right place
         
         self.whole = VGroup(left_suppress.group, bar_1.group, bar_2.group)
-        tilt_matrix = [[1, 0.2], [0, 1]]
+        tilt_matrix = [[1, np.sin(self.tilt)], [0, 1]]
         whole_final = copy.deepcopy(self.whole)
 
         
@@ -191,9 +201,18 @@ class Opening(Scene):
         )
         self.play(FadeOut(whole_final), run_time = 0.0)
 
-        self.play(Transform(self.whole, whole_final, time = 1))
+        self.play(Transform(self.whole, whole_final, time = 1.5))
         self.wait()
         
+        # fade out
+        self.play(AnimationGroup(
+                left_suppress.uncreate_animation(),
+                bar_1.uncreate_animation(),
+                bar_2.uncreate_animation(),
+                lag_ratio=0.05
+            ),
+        )
+        self.wait()
         
 
 # manim -pql logo.py Opening
