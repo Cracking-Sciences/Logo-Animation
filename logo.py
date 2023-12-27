@@ -105,15 +105,25 @@ class Opening(Scene):
         self.left_suppress_thickness = 1.20
         self.bar_height = 2.1
         self.bar_thickness = 0.9
-        self.main_color = ManimColor("#AA0000")
+        self.main_color = ManimColor("#CC0000")
         self.main_opacity = 0.8
-        self.sub_color = ManimColor("#BBBBBB")
+        self.sub_color = ManimColor("#000000") # ManimColor("#BBBBBB")
         self.sub_opacity = 0.8
+        self.background_color = ManimColor("#FFFFFF")
 
     def construct(self):
+        
+        background = Rectangle(
+            width=config.frame_width,
+            height=config.frame_height,
+            fill_color=WHITE,
+            fill_opacity=1
+        )
+        background.shift(ORIGIN)
+        self.add(background)
+
         plane = NumberPlane()
         # self.add(plane)
-
         left_suppress = LeftSuppress(
             self.main_color,
             self.main_opacity,
@@ -224,3 +234,7 @@ class Opening(Scene):
         
 
 # manim -pqh logo.py Opening
+
+# gif
+
+# manim -pqh --resolution 160,128 --format=gif logo.py Opening
